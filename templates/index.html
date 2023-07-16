@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AQI Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+</head>
+
+<body>
+    <nav>
+
+    </nav>
+    <h1>Air Quality Index Prediction</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>AQI Data</h2>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('predict') }}" method="POST">
+                <div class="input-group">
+                    <label for="pm25">PM2.5: </label>
+                    <br>
+                    <input type="text" id="pm25" name="pm25" placeholder="μg/m³" required>
+                </div>
+                <div class="input-group">
+                    <label for="pm10">PM10: </label>
+                    <br>
+                    <input type="text" id="pm10" name="pm10" placeholder="μg/m³" required>
+                </div>
+                <div class="input-group">
+                    <label for="o3">O3: </label>
+                    <br>
+                    <input type="text" id="o3" name="o3" placeholder="μg/m³" required>
+                </div>
+                <div class="input-group">
+                    <label for="so2">SO2: </label>
+                    <br>
+                    <input type="text" id="so2" name="so2" placeholder="μg/m³" required>
+                </div>
+                <div class="input-group">
+                    <label for="co">CO: </label>
+                    <br>
+                    <input type="text" id="co" name="co" placeholder="μg/m³" required>
+                </div>
+                <div class="input-group">
+                    <label for="wind_speed">Wind Speed: </label>
+                    <br>
+                    <input type="text" id="wind_speed" name="wind_speed" placeholder="kph" required>
+                </div>
+                <div class="input-group">
+                    <label for="temperature">Temperature: </label>
+                    <br>
+                    <input type="text" id="temperature" name="temperature" placeholder="℃" required>
+                </div>
+                <input type="submit" value="Predict">
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

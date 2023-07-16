@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AQI Result</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='result.css') }}">
+</head>
+
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1>AQI Result</h1>
+        </div><br><br>
+        <div class="card-body">
+            <div class="card-body result6">
+                <p class="aqi">{{ text }}</p>
+            </div>
+
+        </div>
+    </div>
+    <h2>{{health_impact}}</h2>
+    <p></p>
+</body>
+
+</html>
