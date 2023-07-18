@@ -1,21 +1,234 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.css"
+      rel="stylesheet"
+    />
     <title>AQI Prediction</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
-</head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+  </head>
 
-<body>
-    <nav>
+  <body class="bg-gray-100">
+    
 
-    </nav>
-    <h1>Air Quality Index Prediction</h1>
-
-    <div class="card">
-        <div class="card-header">
-            <h2>AQI Data</h2>
+    <nav
+      class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+    >
+      <div class="px-3 py-3 lg:px-5 lg:pl-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start">
+            <button
+              data-drawer-target="logo-sidebar"
+              data-drawer-toggle="logo-sidebar"
+              aria-controls="logo-sidebar"
+              type="button"
+              class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            >
+              <span class="sr-only">Open sidebar</span>
+              <svg
+                class="w-6 h-6"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  clip-rule="evenodd"
+                  fill-rule="evenodd"
+                  d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+                ></path>
+              </svg>
+            </button>
+            <a class="flex ml-2 md:mr-24">
+              <img
+                src="{{ url_for('static', filename='logo-no-background.svg') }}"
+                class="h-8 mr-3"
+                alt=""
+              />
+              <span
+                class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"
+                >Air Quality Index</span
+              >
+            </a>
+          </div>
         </div>
+      </div>
+    </nav>
+
+    <aside
+      id="logo-sidebar"
+      class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+      aria-label="Sidebar"
+    >
+      <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+        <ul class="space-y-2 font-medium">
+          <li>
+            <a
+              href="{{ url_for('static', filename='dashboard.html') }}"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path fill-rule="evenodd" d="M2.25 13.5a8.25 8.25 0 018.25-8.25.75.75 0 01.75.75v6.75H18a.75.75 0 01.75.75 8.25 8.25 0 01-16.5 0z" clip-rule="evenodd" />
+              <path fill-rule="evenodd" d="M12.75 3a.75.75 0 01.75-.75 8.25 8.25 0 018.25 8.25.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75V3z" clip-rule="evenodd" />
+            </svg>
+            
+            
+                <path
+                  d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"
+                />
+                <path
+                  d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"
+                />
+              </svg>
+              <span class="ml-3">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path fill-rule="evenodd" d="M8.161 2.58a1.875 1.875 0 011.678 0l4.993 2.498c.106.052.23.052.336 0l3.869-1.935A1.875 1.875 0 0121.75 4.82v12.485c0 .71-.401 1.36-1.037 1.677l-4.875 2.437a1.875 1.875 0 01-1.676 0l-4.994-2.497a.375.375 0 00-.336 0l-3.868 1.935A1.875 1.875 0 012.25 19.18V6.695c0-.71.401-1.36 1.036-1.677l4.875-2.437zM9 6a.75.75 0 01.75.75V15a.75.75 0 01-1.5 0V6.75A.75.75 0 019 6zm6.75 3a.75.75 0 00-1.5 0v8.25a.75.75 0 001.5 0V9z" clip-rule="evenodd" />
+            </svg>
+            
+              <span class="flex-1 ml-3 whitespace-nowrap">Maps</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM6.262 6.072a8.25 8.25 0 1010.562-.766 4.5 4.5 0 01-1.318 1.357L14.25 7.5l.165.33a.809.809 0 01-1.086 1.085l-.604-.302a1.125 1.125 0 00-1.298.21l-.132.131c-.439.44-.439 1.152 0 1.591l.296.296c.256.257.622.374.98.314l1.17-.195c.323-.054.654.036.905.245l1.33 1.108c.32.267.46.694.358 1.1a8.7 8.7 0 01-2.288 4.04l-.723.724a1.125 1.125 0 01-1.298.21l-.153-.076a1.125 1.125 0 01-.622-1.006v-1.089c0-.298-.119-.585-.33-.796l-1.347-1.347a1.125 1.125 0 01-.21-1.298L9.75 12l-1.64-1.64a6 6 0 01-1.676-3.257l-.172-1.03z" clip-rule="evenodd" />
+            </svg>
+            
+            
+              <span class="flex-1 ml-3 whitespace-nowrap">Predict</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm14.25 6a.75.75 0 01-.22.53l-2.25 2.25a.75.75 0 11-1.06-1.06L15.44 12l-1.72-1.72a.75.75 0 111.06-1.06l2.25 2.25c.141.14.22.331.22.53zm-10.28-.53a.75.75 0 000 1.06l2.25 2.25a.75.75 0 101.06-1.06L8.56 12l1.72-1.72a.75.75 0 10-1.06-1.06l-2.25 2.25z" clip-rule="evenodd" />
+            </svg>
+            
+              <span class="flex-1 ml-3 whitespace-nowrap">Source Code</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+    <div class="p-4 sm:ml-64 justify-center">
+      <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
+         
+    <main class="p-8 flex flex-col justify-end">
+      <section>
+          <h2 class="text-2xl font-bold mb-4">About Us</h2>
+          <p class="mb-4">
+              Weather AQI India is a website dedicated to providing real-time weather and Air Quality Index (AQI)
+              information for various locations across India. We believe in enabling people to make informed decisions
+              about their outdoor activities and health by staying aware of the current air quality and weather
+              conditions.
+          </p>
+          <p class="mb-4">
+              Our platform pulls data from reliable sources and utilizes sophisticated algorithms to calculate and
+              present the AQI. The AQI helps you understand the quality of air in your area, empowering you to take
+              precautions and make choices for better health and well-being.
+          </p>
+          <p class="mb-4">
+              Whether you're planning your day, engaging in outdoor activities, or simply concerned about the air you
+              breathe, Weather AQI India is here to provide you with accurate and up-to-date information.
+          </p>
+      </section>
+
+      <section class="mt-8">
+          <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
+          <p class="mb-4">
+              Our mission is to raise awareness about air quality and its impact on public health. By making AQI data
+              easily accessible, we aim to empower individuals, communities, and organizations to take proactive steps
+              towards improving air quality and protecting their well-being.
+          </p>
+          <p class="mb-4">
+              We believe that by fostering a culture of environmental responsibility and accountability, we can make a
+              positive impact on the air we breathe and contribute to a healthier and more sustainable future for India.
+          </p>
+      </section>
+      <section>
+        <form action="{{ url_for('predict') }}" method="POST">
+          <div class="mb-6  p-4">
+            
+            <label for="pm25">PM2.5: </label>
+            <br />
+            <input type="text" id="pm25" name="pm25" placeholder="μg/m³" required />
+          </div>
+          <div class="mb-6  p-4">
+            <label for="pm10">PM10: </label>
+            <br />
+            <input type="text" id="pm10" name="pm10" placeholder="μg/m³" required />
+          </div>
+          <div class="mb-6  p-4">
+            <label for="o3">O3: </label>
+            <br />
+            <input type="text" id="o3" name="o3" placeholder="μg/m³" required />
+          </div>
+          <div class="mb-6  p-4">
+            <label for="so2">SO2: </label>
+            <br />
+            <input type="text" id="so2" name="so2" placeholder="μg/m³" required />
+          </div>
+          <div class="mb-6 p-4">
+            <label for="co">CO: </label>
+            <br />
+            <input type="text" id="co" name="co" placeholder="μg/m³" required />
+          </div>
+          <div class="mb-6  p-4">
+            <label for="wind_speed">Wind Speed: </label>
+            <br />
+            <input
+              type="text"
+              id="wind_speed"
+              name="wind_speed"
+              placeholder="kph"
+              required
+            />
+          </div>
+          <div class="mb-6 p-4">
+            <label for="temperature">Temperature: </label>
+            <br />
+            <input
+              type="text"
+              id="temperature"
+              name="temperature"
+              placeholder="℃"
+              required
+            />
+          </div>
+          <div class="mb-6">
+            <input
+              type="submit"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              value="Predict"
+            />
+          </div>
+        </div>
+      </form>
+      </section>
+  </main>
+
+
+    <!-- <div>
+        
         <div class="card-body">
             <form action="{{ url_for('predict') }}" method="POST">
                 <div class="input-group">
@@ -53,10 +266,16 @@
                     <br>
                     <input type="text" id="temperature" name="temperature" placeholder="℃" required>
                 </div>
-                <input type="submit" value="Predict">
+                <div class="card">
+                  <input type="submit" value="Predict">
+                </div>
+                
             </form>
         </div>
-    </div>
-</body>
+    </div> -->
 
+     
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.7.0/flowbite.min.js"></script>
+  </body>
 </html>
