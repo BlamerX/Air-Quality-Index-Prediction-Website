@@ -5,7 +5,6 @@
 # What is AQI?
 
 Air Quality Index (AQI) is a number used to convey the quality of air by the government to the general public. Air quality deteriorates with an increase in the concentration of pollutants. The Air Quality Index represents the severity of pollution for ordinary people.
-
 # Indian AQI range & probable impacts:
 
 | AQI Range |                        Color Code                         |                          Possible Health Impacts                          |
