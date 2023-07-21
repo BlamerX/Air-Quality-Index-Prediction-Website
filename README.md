@@ -2,7 +2,7 @@
 
 ![](https://i.pinimg.com/originals/35/22/fb/3522fb7f22a318b70b6f07b78f52e62c.png)
 
-# What is AQI ?
+# What is AQI?
 
 Air Quality Index (AQI) is a number used to convey the quality of air by the government to the general public. Air quality deteriorates with an increase in the concentration of pollutants. The Air Quality Index represents the severity of pollution for ordinary people.
 
