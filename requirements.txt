@@ -3,6 +3,6 @@ gunicorn
 joblib
 numpy
 pandas
-scikit-learn==1.2.2
+scikit-learn==1.2
 scipy
 xgboost
