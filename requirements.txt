@@ -1,3 +1,6 @@
+setuptools>=45
+wheel
+setuptools_scm>=6.2
 flask==2.3.3
 pandas==1.5.3
 numpy==1.24.3
