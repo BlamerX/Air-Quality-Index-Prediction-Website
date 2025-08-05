@@ -1,76 +1,912 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>AQI Prediction</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQI Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
-            padding-top: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .container {
-            background-color: #ffffff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
-        h1 {
-            text-align: center;
+        .header:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-content {
+            min-height: calc(100vh - 200px);
+            padding: 40px 0;
+        }
+
+        .prediction-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .prediction-card:hover::before {
+            left: 100%;
+        }
+
+        .prediction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .aqi-indicator {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0 auto 15px;
+            transition: all 0.3s ease;
+        }
+
+        .aqi-indicator:hover {
+            transform: scale(1.1);
+        }
+
+        .aqi-good {
+            background-color: #00e400;
+        }
+
+        .aqi-moderate {
+            background-color: #ffff00;
+            color: #000;
+        }
+
+        .aqi-unhealthy-sensitive {
+            background-color: #ff7e00;
+        }
+
+        .aqi-unhealthy {
+            background-color: #ff0000;
+        }
+
+        .aqi-very-unhealthy {
+            background-color: #8f3f97;
+        }
+
+        .aqi-hazardous {
+            background-color: #7e0023;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
 
         .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .model-status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #17a2b8;
+            transition: all 0.3s ease;
+        }
+
+        .model-status:hover {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+            }
+        }
+
+        .status-ok {
+            background-color: #28a745;
+        }
+
+        .status-error {
+            background-color: #dc3545;
+        }
+
+        .status-warning {
+            background-color: #ffc107;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #ced4da;
+        }
+
+        .city-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .city-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .city-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .city-info {
+            flex-grow: 1;
+        }
+
+        .city-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .city-state {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .city-aqi {
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            min-width: 60px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .city-aqi:hover {
+            transform: scale(1.1);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .search-input {
+            padding-left: 40px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .city-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            color: white;
+        }
+
+        .aqi-advice {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .aqi-advice h5 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .advice-item {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .advice-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .prediction-animation {
+            animation: predictionPulse 1s ease-out;
+        }
+
+        @keyframes predictionPulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Main content -->
-    <div class="container mt-4">
-        <h1>Welcome to AQI Prediction</h1>
-        <form action="/predict" method="post">
-            <div class="form-group">
-                <label for="pm25">PM2.5:</label>
-                <input type="number" step="any" class="form-control" id="pm25" name="pm25" required>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1><i class="fas fa-wind"></i> AQI Prediction System</h1>
+                    <p class="mb-0">Real-time Air Quality Index Prediction for India</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-light" onclick="window.location.href='/loading'">
+                        <i class="fas fa-sync-alt"></i> Retrain Models
+                    </button>
+                    <button class="btn btn-warning ms-2" onclick="window.location.href='/results'">
+                        <i class="fas fa-chart-bar"></i> View Results
+                    </button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="pm10">PM10:</label>
-                <input type="number" step="any" class="form-control" id="pm10" name="pm10" required>
-            </div>
-            <div class="form-group">
-                <label for="o3">Ozone (O3):</label>
-                <input type="number" step="any" class="form-control" id="o3" name="o3" required>
-            </div>
-            <div class="form-group">
-                <label for="so2">Sulfur Dioxide (SO2):</label>
-                <input type="number" step="any" class="form-control" id="so2" name="so2" required>
-            </div>
-            <div class="form-group">
-                <label for="co">Carbon Monoxide (CO):</label>
-                <input type="number" step="any" class="form-control" id="co" name="co" required>
-            </div>
-            <div class="form-group">
-                <label for="wind_speed">Wind Speed:</label>
-                <input type="number" step="any" class="form-control" id="wind_speed" name="wind_speed" required>
-            </div>
-            <div class="form-group">
-                <label for="temperature">Temperature:</label>
-                <input type="number" step="any" class="form-control" id="temperature" name="temperature" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Predict AQI</button>
-        </form>
-    </div>
+        </div>
+    </header>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="row">
+                <!-- Prediction Form -->
+                <div class="col-lg-6">
+                    <div class="prediction-card">
+                        <h3 class="mb-3"><i class="fas fa-calculator"></i> Predict AQI</h3>
+                        <!-- Model Status -->
+                        <div class="model-status" id="modelStatus">
+                            <div class="d-flex align-items-center">
+                                <span class="status-indicator status-warning" id="statusIndicator"></span>
+                                <span id="statusText">Checking model status...</span>
+                            </div>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-info btn-sm" onclick="showModelStatus()">
+                                    <i class="fas fa-check-circle"></i> Check Model Status
+                                </button>
+                            </div>
+                        </div>
+                        <form id="predictionForm">
+                            <div class="form-group">
+                                <label class="form-label">PM2.5 (µg/m³)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="pm25" step="0.1" required min="0"
+                                        max="1000">
+                                    <span class="input-group-text">µg/m³</span>
+                                </div>
+                                <small class="text-muted">Range: 0-1000 µg/m³</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">PM10 (µg/m³)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="pm10" step="0.1" required min="0"
+                                        max="2000">
+                                    <span class="input-group-text">µg/m³</span>
+                                </div>
+                                <small class="text-muted">Range: 0-2000 µg/m³</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">O3 (µg/m³)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="o3" step="0.1" required min="0">
+                                    <span class="input-group-text">µg/m³</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">SO2 (µg/m³)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="so2" step="0.1" required min="0">
+                                    <span class="input-group-text">µg/m³</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CO (µg/m³)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="co" step="0.1" required min="0">
+                                    <span class="input-group-text">µg/m³</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Wind Speed (km/h)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="windSpeed" step="0.1" required
+                                        min="0">
+                                    <span class="input-group-text">km/h</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Humidity (%)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="humidity" step="0.1" required min="0"
+                                        max="100">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Range: 0-100%</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Temperature (°C)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="temp" step="0.1" required min="-50"
+                                        max="60">
+                                    <span class="input-group-text">°C</span>
+                                </div>
+                                <small class="text-muted">Range: -50°C to 60°C</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100" id="predictButton">
+                                <i class="fas fa-magic"></i> Predict AQI
+                            </button>
+                        </form>
+                    </div>
+                    <!-- Prediction Result -->
+                    <div id="predictionResult" class="prediction-card" style="display: none;">
+                        <h3 class="mb-3"><i class="fas fa-chart-line"></i> Prediction Result</h3>
+                        <div id="aqiIndicator" class="aqi-indicator"></div>
+                        <h4 id="aqiValue" class="text-center mb-2"></h4>
+                        <p id="aqiType" class="text-center mb-3"></p>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted">Model Used</small>
+                                <p id="modelUsed" class="mb-0 fw-bold"></p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Confidence</small>
+                                <p id="confidence" class="mb-0 fw-bold"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Cities Section -->
+                <div class="col-lg-6">
+                    <div class="prediction-card">
+                        <h3 class="mb-3"><i class="fas fa-city"></i> City AQI Data</h3>
+                        <!-- Search Box -->
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="form-control search-input" id="citySearch"
+                                placeholder="Search cities...">
+                        </div>
+                        <div class="city-list" id="cityList">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading cities data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-city fa-2x text-primary mb-2"></i>
+                        <h4 id="cityCount">-</h4>
+                        <p class="text-muted mb-0">Cities Covered</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-brain fa-2x text-success mb-2"></i>
+                        <h4>10+</h4>
+                        <p class="text-muted mb-0">ML Models</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                        <h4>99%+</h4>
+                        <p class="text-muted mb-0">Accuracy</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                        <h4>Real-time</h4>
+                        <p class="text-muted mb-0">Updates</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Store all cities data globally
+        let allCities = [];
+
+        // Function to get AQI color class
+        function getAQIColorClass(aqi) {
+            if (aqi <= 50) return 'aqi-good';
+            if (aqi <= 100) return 'aqi-moderate';
+            if (aqi <= 200) return 'aqi-unhealthy-sensitive';
+            if (aqi <= 300) return 'aqi-unhealthy';
+            if (aqi <= 400) return 'aqi-very-unhealthy';
+            return 'aqi-hazardous';
+        }
+
+        // Function to get AQI color hex
+        function getAQIColorHex(aqi) {
+            if (aqi <= 50) return '#00e400';
+            if (aqi <= 100) return '#ffff00';
+            if (aqi <= 200) return '#ff7e00';
+            if (aqi <= 300) return '#ff0000';
+            if (aqi <= 400) return '#8f3f97';
+            return '#7e0023';
+        }
+
+        // Function to get AQI type from AQI value
+        function getAQIType(aqi) {
+            if (aqi <= 50) return 'Good';
+            if (aqi <= 100) return 'Satisfactory';
+            if (aqi <= 200) return 'Moderate';
+            if (aqi <= 300) return 'Poor';
+            if (aqi <= 400) return 'Very Poor';
+            return 'Severe';
+        }
+
+        // Function to check model status
+        async function checkModelStatus() {
+            try {
+                // First check if model file exists
+                const infoResponse = await fetch('/api/model_info');
+                const infoData = await infoResponse.json();
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                const predictButton = document.getElementById('predictButton');
+
+                if (!infoData.success) {
+                    statusIndicator.className = 'status-indicator status-error';
+                    statusText.textContent = `Model Error: ${infoData.message}`;
+                    predictButton.disabled = true;
+                    predictButton.textContent = 'Model Not Available';
+                    predictButton.className = 'btn btn-danger w-100';
+                    return false;
+                }
+
+                // If file exists, try to load the model
+                const response = await fetch('/api/model_status');
+                const data = await response.json();
+
+                if (data.success) {
+                    statusIndicator.className = 'status-indicator status-ok';
+                    statusText.textContent = `Model Ready: ${data.model_name}`;
+                    predictButton.disabled = false;
+                    predictButton.textContent = 'Predict AQI';
+                    predictButton.className = 'btn btn-primary w-100';
+                    return true;
+                } else {
+                    statusIndicator.className = 'status-indicator status-error';
+                    statusText.textContent = `Model Error: ${data.message}`;
+                    predictButton.disabled = true;
+                    predictButton.textContent = 'Model Not Available';
+                    predictButton.className = 'btn btn-danger w-100';
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error checking model status:', error);
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                const predictButton = document.getElementById('predictButton');
+                statusIndicator.className = 'status-indicator status-error';
+                statusText.textContent = 'Connection Error';
+                predictButton.disabled = true;
+                predictButton.textContent = 'Connection Error';
+                predictButton.className = 'btn btn-danger w-100';
+                return false;
+            }
+        }
+
+        // Function to show detailed model status
+        async function showModelStatus() {
+            try {
+                // First check model info
+                const infoResponse = await fetch('/api/model_info');
+                const infoData = await infoResponse.json();
+
+                if (!infoData.success) {
+                    alert(`Model Status: ERROR\n\n${infoData.message}\n\nTraining Complete: ${infoData.training_complete}\nCurrent Phase: ${infoData.current_phase}`);
+                    return;
+                }
+
+                // If file exists, try to get detailed status
+                const response = await fetch('/api/model_status');
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Model Status: OK\n\nModel: ${data.model_name}\nType: ${data.model_type}\nScaler: ${data.scaler_type}\nFile Size: ${data.file_size} bytes\nModified: ${data.file_modified}\nTraining Complete: ${data.training_complete}\nCurrent Phase: ${data.current_phase}`);
+                } else {
+                    alert(`Model Status: ERROR\n\n${data.message}\n\nFile Size: ${infoData.file_size} bytes\nModified: ${infoData.file_modified}`);
+                }
+            } catch (error) {
+                alert('Error checking model status: ' + error.message);
+            }
+        }
+
+        // Function to render cities list
+        function renderCitiesList(cities) {
+            const cityList = document.getElementById('cityList');
+            if (cities.length === 0) {
+                cityList.innerHTML = '<div class="no-results">No cities found matching your search.</div>';
+                return;
+            }
+
+            cityList.innerHTML = '';
+            cities.forEach(city => {
+                const cityItem = document.createElement('div');
+                cityItem.className = 'city-item';
+                cityItem.onclick = () => handleCityClick(city);
+
+                const aqiColor = getAQIColorHex(city.AQI);
+
+                // Create a badge for the AQI type
+                const aqiType = getAQIType(city.AQI);
+                const aqiClass = getAQIColorClass(city.AQI).replace('aqi-', '');
+
+                cityItem.innerHTML = `
+                    <div class="city-info">
+                        <div class="city-name">${city.City}</div>
+                        <div class="city-state">${city.State} <span class="city-badge bg-${aqiClass}">${aqiType}</span></div>
+                    </div>
+                    <div class="city-aqi" style="background-color: ${aqiColor};">
+                        ${Math.round(city.AQI)}
+                    </div>
+                `;
+                cityList.appendChild(cityItem);
+            });
+        }
+
+        // Function to handle city click
+        async function handleCityClick(city) {
+            // Auto-fill the form with city data
+            document.getElementById('pm25').value = city['PM2.5'] || 0;
+            document.getElementById('pm10').value = city['PM10'] || 0;
+            document.getElementById('o3').value = city['O3'] || 0;
+            document.getElementById('so2').value = city['SO2'] || 0;
+            document.getElementById('co').value = city['CO'] || 0;
+            document.getElementById('windSpeed').value = city['Wind Speed'] || 0;
+            document.getElementById('humidity').value = city['Humidity'] || 0;
+            document.getElementById('temp').value = city['Temperature'] || 0;
+
+            // Submit the form automatically
+            document.getElementById('predictionForm').dispatchEvent(new Event('submit'));
+        }
+
+        // Function to filter cities based on search input
+        function filterCities() {
+            const searchTerm = document.getElementById('citySearch').value.toLowerCase().trim();
+            if (searchTerm === '') {
+                renderCitiesList(allCities);
+                return;
+            }
+
+            const filteredCities = allCities.filter(city =>
+                city.City.toLowerCase().includes(searchTerm) ||
+                city.State.toLowerCase().includes(searchTerm)
+            );
+            renderCitiesList(filteredCities);
+        }
+
+        // Load cities and AQI data from dataset
+        async function loadCitiesFromDataset() {
+            try {
+                const response = await fetch('/api/dataset_cities');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store cities globally for filtering
+                    allCities = data.cities;
+                    // Update city count
+                    document.getElementById('cityCount').textContent = data.cities.length;
+                    // Display cities
+                    renderCitiesList(data.cities);
+                } else {
+                    console.error('Error loading cities:', data.error);
+                    document.getElementById('cityList').innerHTML =
+                        '<div class="text-center"><p class="text-danger">Error loading cities data: ' + data.error + '</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+                document.getElementById('cityList').innerHTML =
+                    '<div class="text-center"><p class="text-danger">Error loading cities data</p></div>';
+            }
+        }
+
+        // Function to show AQI advice
+        function showAQIAdvice(prediction, advice) {
+            const resultDiv = document.getElementById('predictionResult');
+
+            // Create advice section
+            const adviceDiv = document.createElement('div');
+            adviceDiv.className = 'aqi-advice';
+            adviceDiv.style.borderLeftColor = advice.color;
+            adviceDiv.innerHTML = `
+                <h5><i class="fas fa-info-circle"></i> Health Advisory</h5>
+                <div class="advice-item"><strong>AQI Level:</strong> ${advice.level}</div>
+                <div class="advice-item"><strong>Health Implications:</strong> ${advice.health_implications}</div>
+                <div class="advice-item"><strong>Advice:</strong> ${advice.advice}</div>
+                <div class="advice-item"><strong>Precaution:</strong> ${advice.cautionary_statement}</div>
+            `;
+
+            // Remove existing advice if any
+            const existingAdvice = resultDiv.querySelector('.aqi-advice');
+            if (existingAdvice) {
+                existingAdvice.remove();
+            }
+
+            // Add new advice
+            resultDiv.appendChild(adviceDiv);
+        }
+
+        // Prediction form handler
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Check model status first
+            const modelOk = await checkModelStatus();
+            if (!modelOk) {
+                alert('Model is not available. Please train the model first.');
+                return;
+            }
+
+            // Get all form values
+            const formData = {
+                PM2_5: parseFloat(document.getElementById('pm25').value) || 0,
+                PM10: parseFloat(document.getElementById('pm10').value) || 0,
+                O3: parseFloat(document.getElementById('o3').value) || 0,
+                SO2: parseFloat(document.getElementById('so2').value) || 0,
+                CO: parseFloat(document.getElementById('co').value) || 0,
+                'Wind Speed': parseFloat(document.getElementById('windSpeed').value) || 0,
+                Humidity: parseFloat(document.getElementById('humidity').value) || 0,
+                Temp: parseFloat(document.getElementById('temp').value) || 0
+            };
+
+            console.log('Form data:', formData);
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                console.log('Prediction response:', data);
+
+                if (data.success) {
+                    // Show result with animation
+                    const resultDiv = document.getElementById('predictionResult');
+                    const indicator = document.getElementById('aqiIndicator');
+                    const value = document.getElementById('aqiValue');
+                    const type = document.getElementById('aqiType');
+                    const model = document.getElementById('modelUsed');
+                    const confidence = document.getElementById('confidence');
+
+                    // Add animation class
+                    resultDiv.classList.add('prediction-animation');
+
+                    // Update content
+                    indicator.className = `aqi-indicator aqi-${data.color.replace(' ', '-')}`;
+                    indicator.textContent = data.prediction;
+                    value.textContent = `AQI: ${data.prediction}`;
+                    type.textContent = data.aqi_type;
+                    model.textContent = data.model_name;
+                    confidence.textContent = 'High';
+
+                    // Show result
+                    resultDiv.style.display = 'block';
+
+                    // Show AQI advice
+                    showAQIAdvice(data.prediction, data.advice);
+
+                    // Scroll to result
+                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Remove animation class after animation completes
+                    setTimeout(() => {
+                        resultDiv.classList.remove('prediction-animation');
+                    }, 1000);
+                } else {
+                    alert('Prediction failed: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during prediction: ' + error.message);
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check model status on page load
+            checkModelStatus();
+
+            // Load cities from dataset
+            loadCitiesFromDataset();
+
+            // Set up search functionality
+            document.getElementById('citySearch').addEventListener('input', filterCities);
+
+            // Load model info
+            fetch('/api/training_status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.best_model) {
+                        console.log('Current model:', data.best_model);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching training status:', error);
+                });
+        });
+    </script>
 </body>
 
 </html>
