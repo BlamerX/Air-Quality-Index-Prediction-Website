@@ -110,8 +110,13 @@ cd Air-Quality-Index-Prediction-Website
 #### 2. Create Virtual Environment
 
 ```bash
+# Create virtual environment
 python -m venv venv
+
+# Activate virtual environment
+# On Windows:
 venv\Scripts\activate
+# On macOS/Linux:
 source venv/bin/activate
 ```
 
