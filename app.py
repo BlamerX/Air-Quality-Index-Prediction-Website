@@ -7,7 +7,6 @@ import warnings
 import numpy as np
 import pandas as pd
 import requests
-import tensorflow as tf
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
@@ -15,8 +14,7 @@ from bs4 import BeautifulSoup, Comment
 from concurrent.futures import ThreadPoolExecutor
 
 # Data processing
-from sklearn.experimental import enable_iterative_imputer
-from sklearn.impute import IterativeImputer, KNNImputer
+from sklearn.impute import KNNImputer
 from sklearn.preprocessing import (
     MinMaxScaler,
     StandardScaler,
@@ -27,35 +25,24 @@ from sklearn.preprocessing import (
 from sklearn.model_selection import (
     train_test_split,
     cross_val_score,
-    GridSearchCV,
-    KFold,
 )
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-# Machine Learning Models
-from sklearn.linear_model import LinearRegression, BayesianRidge, Ridge, Lasso
+# Machine Learning Models (CPU-compatible)
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import (
     RandomForestRegressor,
     AdaBoostRegressor,
-    BaggingRegressor,
     ExtraTreesRegressor,
     GradientBoostingRegressor,
-    StackingRegressor,
 )
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.svm import SVR
 
-# Advanced Models
+# Advanced Models (CPU-compatible)
 import xgboost as xgb
 import lightgbm as lgb
 from catboost import CatBoostRegressor
-
-# Deep Learning
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from tensorflow.keras.optimizers import Adam
 
 # Utilities
 import joblib
@@ -71,7 +58,7 @@ from plotly.subplots import make_subplots
 # Settings
 warnings.filterwarnings("ignore")
 pd.set_option("display.max_columns", None)
-plt.style.use("seaborn-v0_8-darkgrid")
+plt.style.use("seaborn-v0_8-dark-palette")
 sns.set_palette("husl")
 
 # Initialize Flask app
@@ -99,13 +86,8 @@ os.makedirs("saved_models", exist_ok=True)
 os.makedirs("static", exist_ok=True)
 os.makedirs("templates", exist_ok=True)
 
-# Check for GPU availability
-gpus = tf.config.list_physical_devices("GPU")
-if gpus:
-    print("✅ GPU Available:", gpus)
-else:
-    print("❌ GPU Available: False")
-print("TensorFlow version:", tf.__version__)
+# CPU-only configuration
+print("Running on CPU")
 
 
 # Data extraction functions
@@ -179,7 +161,7 @@ def scrape_all_cities(base_url, max_workers=50):
     global training_status
     with training_lock:
         training_status["current_step"] = "Starting data extraction..."
-        training_status["logs"].append("🔄 Starting data extraction...")
+        training_status["logs"].append("Starting data extraction...")
 
     start_time = datetime.now()
     try:
@@ -217,7 +199,7 @@ def scrape_all_cities(base_url, max_workers=50):
                                         f"Processed {processed_cities} cities..."
                                     )
                                     training_status["logs"].append(
-                                        f"📊 Processed {processed_cities} cities..."
+                                        f"Processed {processed_cities} cities..."
                                     )
                 except Exception as e:
                     print(f"Error processing state {state_href}: {str(e)}")
@@ -238,15 +220,15 @@ def scrape_all_cities(base_url, max_workers=50):
                 f"Data extraction completed in {extraction_time}"
             )
             training_status["logs"].append(
-                f"✅ Data extraction completed in {extraction_time}"
+                f"Data extraction completed in {extraction_time}"
             )
-            training_status["logs"].append(f"✅ Total cities processed: {len(data)}")
+            training_status["logs"].append(f"Total cities processed: {len(data)}")
 
         return pd.DataFrame(data)
     except Exception as e:
         with training_lock:
             training_status["current_step"] = f"Error in scraping: {str(e)}"
-            training_status["logs"].append(f"❌ Error in scraping: {str(e)}")
+            training_status["logs"].append(f"Error in scraping: {str(e)}")
         return pd.DataFrame()
 
 
@@ -255,7 +237,7 @@ def handle_missing_values(df):
     """Handle missing values using advanced imputation techniques"""
     with training_lock:
         training_status["current_step"] = "Handling missing values..."
-        training_status["logs"].append("🔄 Handling missing values...")
+        training_status["logs"].append("Handling missing values...")
 
     # Separate numerical and categorical columns
     numerical_cols = df.select_dtypes(include=[np.number]).columns
@@ -273,7 +255,7 @@ def handle_missing_values(df):
 
     with training_lock:
         training_status["progress"] = 35
-        training_status["logs"].append("✅ Missing values handled successfully")
+        training_status["logs"].append("Missing values handled successfully")
 
     return df
 
@@ -282,7 +264,7 @@ def create_features(df):
     """Create additional features for better model performance"""
     with training_lock:
         training_status["current_step"] = "Creating additional features..."
-        training_status["logs"].append("🔄 Creating additional features...")
+        training_status["logs"].append("Creating additional features...")
 
     # Create AQI categories based on ranges
     def get_aqi_category(aqi):
@@ -333,7 +315,7 @@ def create_features(df):
 
     with training_lock:
         training_status["progress"] = 50
-        training_status["logs"].append("✅ Feature engineering completed")
+        training_status["logs"].append("Feature engineering completed")
 
     return df, le_state, le_city, le_aqi_type, le_aqi_category
 
@@ -354,28 +336,6 @@ def prepare_features(df):
 
 
 # Model training functions
-def create_dnn_model(input_shape):
-    """Create an improved Deep Neural Network model for AQI"""
-    model = Sequential()
-    model.add(Dense(256, kernel_regularizer="l2", input_shape=(input_shape,)))
-    model.add(tf.keras.layers.LeakyReLU())
-    model.add(BatchNormalization())
-    model.add(Dropout(0.3))
-    model.add(Dense(128, kernel_regularizer="l2"))
-    model.add(tf.keras.layers.LeakyReLU())
-    model.add(BatchNormalization())
-    model.add(Dropout(0.25))
-    model.add(Dense(64, kernel_regularizer="l2"))
-    model.add(tf.keras.layers.LeakyReLU())
-    model.add(BatchNormalization())
-    model.add(Dropout(0.2))
-    model.add(Dense(32, kernel_regularizer="l2"))
-    model.add(tf.keras.layers.LeakyReLU())
-    model.add(BatchNormalization())
-    model.add(Dropout(0.1))
-    model.add(Dense(1))
-    model.compile(optimizer=Adam(learning_rate=0.001), loss="huber", metrics=["mae"])
-    return model
 
 
 def evaluate_models(models, X_train, X_test, y_train, y_test):
@@ -387,7 +347,7 @@ def evaluate_models(models, X_train, X_test, y_train, y_test):
     for name, model in models.items():
         with training_lock:
             training_status["current_step"] = f"Training {name}..."
-            training_status["logs"].append(f"🔄 Training {name}...")
+            training_status["logs"].append(f"Training {name}...")
 
         # Train model
         model.fit(X_train, y_train)
@@ -421,7 +381,7 @@ def evaluate_models(models, X_train, X_test, y_train, y_test):
         with training_lock:
             training_status["progress"] = progress
             training_status["logs"].append(
-                f"✅ {name} - MSE: {mse:.4f}, MAE: {mae:.4f}, R2: {r2:.4f}, CV MSE: {cv_mse:.4f}"
+                f"{name} - MSE: {mse:.4f}, MAE: {mae:.4f}, R2: {r2:.4f}, CV MSE: {cv_mse:.4f}"
             )
 
     return results
@@ -445,10 +405,7 @@ def save_model(model, model_name, scaler, feature_names, encoders):
     os.makedirs("saved_models", exist_ok=True)
 
     # Save model
-    if isinstance(model, Sequential):
-        model.save(f"saved_models/{model_name}.h5")
-    else:
-        joblib.dump(model, f"saved_models/{model_name}.pkl")
+    joblib.dump(model, f"saved_models/{model_name}.pkl")
 
     # Save scaler
     joblib.dump(scaler, f"saved_models/{model_name}_scaler.pkl")
@@ -459,16 +416,13 @@ def save_model(model, model_name, scaler, feature_names, encoders):
     # Save encoders
     joblib.dump(encoders, f"saved_models/{model_name}_encoders.pkl")
 
-    print(f"Model saved as 'saved_models/{model_name}'")
+    print(f"Model saved as saved_models/{model_name}")
 
 
 def load_model(model_name):
     """Load model and related objects"""
     # Load model
-    if os.path.exists(f"saved_models/{model_name}.h5"):
-        model = load_model(f"saved_models/{model_name}.h5")
-    else:
-        model = joblib.load(f"saved_models/{model_name}.pkl")
+    model = joblib.load(f"saved_models/{model_name}.pkl")
 
     # Load scaler
     scaler = joblib.load(f"saved_models/{model_name}_scaler.pkl")
@@ -682,13 +636,13 @@ def training_thread():
             with training_lock:
                 training_status["current_phase"] = "idle"
                 training_status["current_step"] = "Error: No data scraped"
-                training_status["logs"].append("❌ Error: No data scraped")
+                training_status["logs"].append("Error: No data scraped")
             return
 
         # Save raw data
         df.to_csv("AQI_Raw_Data.csv", index=False)
         with training_lock:
-            training_status["logs"].append("✅ Raw data saved to AQI_Raw_Data.csv")
+            training_status["logs"].append("Raw data saved to AQI_Raw_Data.csv")
 
         # Handle missing values
         df_clean = handle_missing_values(df.copy())
@@ -696,15 +650,13 @@ def training_thread():
         # Save cleaned data
         df_clean.to_csv("AQI_Clean_Data.csv", index=False)
         with training_lock:
-            training_status["logs"].append(
-                "✅ Cleaned data saved to AQI_Clean_Data.csv"
-            )
+            training_status["logs"].append("Cleaned data saved to AQI_Clean_Data.csv")
 
         # Feature engineering
         with training_lock:
             training_status["current_phase"] = "feature_selection"
             training_status["current_step"] = "Creating additional features..."
-            training_status["logs"].append("🔄 Creating additional features...")
+            training_status["logs"].append("Creating additional features...")
 
         df_features, le_state, le_city, le_aqi_type, le_aqi_category = create_features(
             df_clean.copy()
@@ -720,7 +672,7 @@ def training_thread():
 
         with training_lock:
             training_status["logs"].append(
-                f"✅ Features prepared: {len(feature_names)} features"
+                f"Features prepared: {len(feature_names)} features"
             )
 
         # Feature scaling comparison
@@ -749,29 +701,28 @@ def training_thread():
         best_scaler = scalers[best_scaler_name]
 
         with training_lock:
-            training_status["logs"].append(
-                f"✅ Best scaler selected: {best_scaler_name}"
-            )
+            training_status["logs"].append(f"Best scaler selected: {best_scaler_name}")
 
         # Apply best scaler
         X_train_scaled = best_scaler.fit_transform(X_train)
         X_test_scaled = best_scaler.transform(X_test)
 
-        # Define models to compare
+        # Define models to compare (CPU-compatible only)
         models = {
             "Linear Regression": LinearRegression(),
             "Ridge Regression": Ridge(),
             "Lasso Regression": Lasso(),
             "Decision Tree": DecisionTreeRegressor(random_state=42),
-            "Random Forest": RandomForestRegressor(random_state=42),
-            "Extra Trees": ExtraTreesRegressor(random_state=42),
+            "Random Forest": RandomForestRegressor(random_state=42, n_jobs=-1),
+            "Extra Trees": ExtraTreesRegressor(random_state=42, n_jobs=-1),
             "Gradient Boosting": GradientBoostingRegressor(random_state=42),
             "AdaBoost": AdaBoostRegressor(random_state=42),
-            "XGBoost": xgb.XGBRegressor(random_state=42),
-            "LightGBM": lgb.LGBMRegressor(random_state=42),
-            "CatBoost": CatBoostRegressor(random_state=42, verbose=False),
-            "KNN": KNeighborsRegressor(),
-            "SVR": SVR(),
+            "XGBoost": xgb.XGBRegressor(random_state=42, n_jobs=-1),
+            "LightGBM": lgb.LGBMRegressor(random_state=42, n_jobs=-1, verbose=-1),
+            "CatBoost": CatBoostRegressor(
+                random_state=42, verbose=False, thread_count=-1
+            ),
+            "KNN": KNeighborsRegressor(n_jobs=-1),
         }
 
         # Model training
@@ -783,88 +734,7 @@ def training_thread():
             models, X_train_scaled, X_test_scaled, y_train, y_test
         )
 
-        # Create DNN model
-        with training_lock:
-            training_status["current_step"] = "Training Deep Neural Network..."
-            training_status["logs"].append("🔄 Training Deep Neural Network...")
-
-        dnn_model = create_dnn_model(X_train_scaled.shape[1])
-
-        # Callbacks
-        early_stopping = EarlyStopping(patience=20, restore_best_weights=True)
-        reduce_lr = ReduceLROnPlateau(factor=0.2, patience=10, min_lr=1e-6)
-
-        # Train model
-        history = dnn_model.fit(
-            X_train_scaled,
-            y_train,
-            validation_split=0.2,
-            epochs=200,
-            batch_size=32,
-            callbacks=[early_stopping, reduce_lr],
-            verbose=0,
-        )
-
-        # Evaluate DNN
-        y_pred_dnn = dnn_model.predict(X_test_scaled).flatten()
-        mse_dnn = mean_squared_error(y_test, y_pred_dnn)
-        mae_dnn = mean_absolute_error(y_test, y_pred_dnn)
-        r2_dnn = r2_score(y_test, y_pred_dnn)
-
-        with training_lock:
-            training_status["logs"].append(
-                f"✅ DNN - MSE: {mse_dnn:.4f}, MAE: {mae_dnn:.4f}, R2: {r2_dnn:.4f}"
-            )
-
-        # Add to results
-        model_results["Deep Neural Network"] = {
-            "MSE": mse_dnn,
-            "MAE": mae_dnn,
-            "R2": r2_dnn,
-            "CV_MSE": mse_dnn,
-            "model": dnn_model,
-            "model_type": "Deep Neural Network",
-        }
-
-        # Create stacked ensemble
-        def create_stacked_model(base_models, meta_model):
-            """Create a stacked ensemble model"""
-            base_estimators = [(name, model) for name, model in base_models.items()]
-            stacked_model = StackingRegressor(
-                estimators=base_estimators, final_estimator=meta_model, cv=5
-            )
-            return stacked_model
-
-        # Select best base models for stacking
-        best_base_models = {
-            "Random Forest": RandomForestRegressor(n_jobs=-1, random_state=42),
-            "Gradient Boosting": GradientBoostingRegressor(random_state=42),
-            "XGBoost": xgb.XGBRegressor(n_jobs=-1, random_state=42),
-            "LightGBM": lgb.LGBMRegressor(
-                n_jobs=-1, force_col_wise=True, random_state=42
-            ),
-        }
-
-        # Create stacked models with different meta-learners
-        stacked_models = {
-            "Stacked (LR)": create_stacked_model(best_base_models, LinearRegression()),
-            "Stacked (Ridge)": create_stacked_model(best_base_models, Ridge()),
-            "Stacked (RF)": create_stacked_model(
-                best_base_models, RandomForestRegressor(random_state=42)
-            ),
-        }
-
-        # Evaluate stacked models
-        with training_lock:
-            training_status["current_step"] = "Evaluating stacked models..."
-            training_status["logs"].append("🔄 Evaluating stacked models...")
-
-        stacked_results = evaluate_models(
-            stacked_models, X_train_scaled, X_test_scaled, y_train, y_test
-        )
-
-        # Add to main results
-        model_results.update(stacked_results)
+        # DNN model and stacked models removed as they're not CPU-friendly for this application
 
         # Create results DataFrame
         results_df = pd.DataFrame(
@@ -933,17 +803,17 @@ def training_thread():
                     "r2": result["R2"],
                     "model_type": result["model_type"],
                 }
-            training_status["logs"].append("🏆 Training complete!")
-            training_status["logs"].append(f"🏆 Best model: {best_model_name}")
-            training_status["logs"].append(f"🏆 MSE: {best_mse:.4f}")
-            training_status["logs"].append(f"🏆 MAE: {best_mae:.4f}")
-            training_status["logs"].append(f"🏆 R²: {best_r2:.4f}")
+            training_status["logs"].append("Training complete!")
+            training_status["logs"].append(f"Best model: {best_model_name}")
+            training_status["logs"].append(f"MSE: {best_mse:.4f}")
+            training_status["logs"].append(f"MAE: {best_mae:.4f}")
+            training_status["logs"].append(f"R2: {best_r2:.4f}")
 
     except Exception as e:
         with training_lock:
             training_status["current_phase"] = "idle"
             training_status["current_step"] = f"Error: {str(e)}"
-            training_status["logs"].append(f"❌ Error: {str(e)}")
+            training_status["logs"].append(f"Error: {str(e)}")
 
 
 # Flask routes
@@ -979,9 +849,7 @@ def reset_training():
             training_status["current_phase"] = "idle"
             training_status["current_step"] = "Ready to start training"
             training_status["progress"] = 0
-            training_status["logs"] = [
-                "🚀 System ready. Click 'Start Training' to begin."
-            ]
+            training_status["logs"] = ["System ready. Click 'Start Training' to begin."]
             training_status["training_complete"] = False
             training_status["best_model"] = None
             training_status["model_metrics"] = {}
@@ -1003,11 +871,9 @@ def model_status():
         # Check if model file exists
         model_files = [
             "saved_models/Extra Trees.pkl",
-            "saved_models/Extra Trees.h5",
             "saved_models/Random Forest.pkl",
-            "saved_models/Random Forest.h5",
             "saved_models/XGBoost.pkl",
-            "saved_models/XGBoost.h5",
+            "saved_models/Gradient Boosting.pkl",
         ]
         model_found = False
         model_file = None
@@ -1042,8 +908,8 @@ def model_status():
             model_type = "Random Forest Regressor"
         elif "XGBoost" in model_name:
             model_type = "XGBoost Regressor"
-        elif "DNN" in model_name or "Neural" in model_name:
-            model_type = "Deep Neural Network"
+        elif "Gradient Boosting" in model_name:
+            model_type = "Gradient Boosting Regressor"
 
         # Determine scaler type
         scaler_type = "Unknown"
@@ -1084,11 +950,9 @@ def model_info():
         # Check if model file exists
         model_files = [
             "saved_models/Extra Trees.pkl",
-            "saved_models/Extra Trees.h5",
             "saved_models/Random Forest.pkl",
-            "saved_models/Random Forest.h5",
             "saved_models/XGBoost.pkl",
-            "saved_models/XGBoost.h5",
+            "saved_models/Gradient Boosting.pkl",
         ]
         model_found = False
         model_file = None
@@ -1161,11 +1025,9 @@ def predict():
         # Find the best model
         model_files = [
             "saved_models/Extra Trees.pkl",
-            "saved_models/Extra Trees.h5",
             "saved_models/Random Forest.pkl",
-            "saved_models/Random Forest.h5",
             "saved_models/XGBoost.pkl",
-            "saved_models/XGBoost.h5",
+            "saved_models/Gradient Boosting.pkl",
         ]
         model_found = False
         model_file = None
@@ -1333,7 +1195,7 @@ def refresh_data():
                     training_status["current_phase"] = "gathering"
                     training_status["current_step"] = "Starting data extraction..."
                     training_status["progress"] = 0
-                    training_status["logs"] = ["🔄 Starting data extraction..."]
+                    training_status["logs"] = ["Starting data extraction..."]
 
                 # Main URL for scraping
                 base_url = "https://air-quality.com/country/india/3ffd900b?lang=en&standard=naqi_in"
@@ -1345,7 +1207,7 @@ def refresh_data():
                     with training_lock:
                         training_status["current_phase"] = "idle"
                         training_status["current_step"] = "Error: No data scraped"
-                        training_status["logs"].append("❌ Error: No data scraped")
+                        training_status["logs"].append("Error: No data scraped")
                     return
 
                 # Save raw data
@@ -1361,12 +1223,12 @@ def refresh_data():
                     training_status["current_phase"] = "complete"
                     training_status["progress"] = 100
                     training_status["current_step"] = "Data refresh complete!"
-                    training_status["logs"].append("✅ Data refresh complete!")
+                    training_status["logs"].append("Data refresh complete!")
             except Exception as e:
                 with training_lock:
                     training_status["current_phase"] = "idle"
                     training_status["current_step"] = f"Error: {str(e)}"
-                    training_status["logs"].append(f"❌ Error: {str(e)}")
+                    training_status["logs"].append(f"Error: {str(e)}")
 
         thread = threading.Thread(target=gather_data_only)
         thread.daemon = True
@@ -1479,7 +1341,7 @@ if __name__ == "__main__":
         training_status["current_phase"] = "idle"
         training_status["current_step"] = "Ready to start training"
         training_status["progress"] = 0
-        training_status["logs"] = ["🚀 System ready. Click 'Gather Data' to begin."]
+        training_status["logs"] = ["System ready. Click 'Gather Data' to begin."]
         training_status["training_complete"] = False
 
     # Check if we have existing data
@@ -1491,11 +1353,9 @@ if __name__ == "__main__":
     # Check if we have a trained model
     model_files = [
         "saved_models/Extra Trees.pkl",
-        "saved_models/Extra Trees.h5",
         "saved_models/Random Forest.pkl",
-        "saved_models/Random Forest.h5",
         "saved_models/XGBoost.pkl",
-        "saved_models/XGBoost.h5",
+        "saved_models/Gradient Boosting.pkl",
     ]
     model_found = False
     for file in model_files:

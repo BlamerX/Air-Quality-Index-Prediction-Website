@@ -9,22 +9,101 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
             padding: 20px 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: headerPulse 8s infinite ease-in-out;
+        }
+
+        @keyframes headerPulse {
+
+            0%,
+            100% {
+                transform: scale(0.8) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(1.2) rotate(180deg);
+            }
         }
 
         .header:hover {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            position: relative;
+            z-index: 1;
         }
 
         .main-content {
@@ -41,6 +120,19 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .prediction-card::before {
@@ -63,6 +155,14 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
+        .prediction-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .prediction-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
         .aqi-indicator {
             width: 60px;
             height: 60px;
@@ -75,10 +175,48 @@
             font-size: 18px;
             margin: 0 auto 15px;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aqi-indicator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .aqi-indicator:hover::after {
+            width: 100%;
+            height: 100%;
         }
 
         .aqi-indicator:hover {
             transform: scale(1.1);
+        }
+
+        .aqi-indicator.pulse {
+            animation: aqiPulse 2s infinite;
+        }
+
+        @keyframes aqiPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
         }
 
         .aqi-good {
@@ -112,7 +250,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             border: none;
             transition: all 0.3s ease;
             position: relative;
@@ -137,6 +275,36 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary.predicting {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-primary.predicting::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .btn-secondary {
@@ -176,11 +344,48 @@
             text-align: center;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+
+        .stats-card:nth-child(1) {
+            animation-delay: 0.3s;
+        }
+
+        .stats-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .stats-card:nth-child(3) {
+            animation-delay: 0.5s;
+        }
+
+        .stats-card:nth-child(4) {
+            animation-delay: 0.6s;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card i {
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover i {
+            transform: scale(1.2) rotate(5deg);
         }
 
         .form-group {
@@ -253,11 +458,33 @@
             align-items: center;
             transition: all 0.2s;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .city-item:hover::before {
+            left: 100%;
         }
 
         .city-item:hover {
             background-color: #f8f9fa;
             transform: translateX(5px);
+        }
+
+        .city-item.selected {
+            background-color: rgba(102, 126, 234, 0.1);
+            border-left: 3px solid #667eea;
         }
 
         .city-info {
@@ -282,6 +509,26 @@
             min-width: 60px;
             text-align: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-aqi::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .city-aqi:hover::after {
+            width: 100%;
+            height: 100%;
         }
 
         .city-aqi:hover {
@@ -335,6 +582,24 @@
             border-left: 5px solid;
             transition: all 0.3s ease;
             animation: slideInUp 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .aqi-advice::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .aqi-advice:hover::before {
+            opacity: 1;
         }
 
         @keyframes slideInUp {
@@ -391,15 +656,20 @@
 </head>
 
 <body>
+    <!-- Animated Background Particles -->
+    <div class="particles" id="particles"></div>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <h1><i class="fas fa-wind"></i> AQI Prediction System</h1>
-                    <p class="mb-0">Real-time Air Quality Index Prediction for India</p>
+                    <h1 class="animate__animated animate__fadeInLeft"><i class="fas fa-wind"></i> AQI Prediction System
+                    </h1>
+                    <p class="mb-0 animate__animated animate__fadeInLeft">Real-time Air Quality Index Prediction for
+                        India</p>
                 </div>
-                <div class="col-md-6 text-end">
+                <div class="col-md-6 text-end animate__animated animate__fadeInRight">
                     <button class="btn btn-light" onclick="window.location.href='/loading'">
                         <i class="fas fa-sync-alt"></i> Retrain Models
                     </button>
@@ -580,6 +850,7 @@
     <script>
         // Store all cities data globally
         let allCities = [];
+        let selectedCity = null;
 
         // Function to get AQI color class
         function getAQIColorClass(aqi) {
@@ -724,18 +995,45 @@
 
         // Function to handle city click
         async function handleCityClick(city) {
-            // Auto-fill the form with city data
-            document.getElementById('pm25').value = city['PM2.5'] || 0;
-            document.getElementById('pm10').value = city['PM10'] || 0;
-            document.getElementById('o3').value = city['O3'] || 0;
-            document.getElementById('so2').value = city['SO2'] || 0;
-            document.getElementById('co').value = city['CO'] || 0;
-            document.getElementById('windSpeed').value = city['Wind Speed'] || 0;
-            document.getElementById('humidity').value = city['Humidity'] || 0;
-            document.getElementById('temp').value = city['Temperature'] || 0;
+            // Remove previous selection
+            document.querySelectorAll('.city-item').forEach(item => {
+                item.classList.remove('selected');
+            });
 
-            // Submit the form automatically
-            document.getElementById('predictionForm').dispatchEvent(new Event('submit'));
+            // Add selection to clicked city
+            event.currentTarget.classList.add('selected');
+
+            // Store selected city
+            selectedCity = city;
+
+            // Auto-fill the form with city data with animation
+            const formFields = [
+                { id: 'pm25', value: city['PM2.5'] || 0 },
+                { id: 'pm10', value: city['PM10'] || 0 },
+                { id: 'o3', value: city['O3'] || 0 },
+                { id: 'so2', value: city['SO2'] || 0 },
+                { id: 'co', value: city['CO'] || 0 },
+                { id: 'windSpeed', value: city['Wind Speed'] || 0 },
+                { id: 'humidity', value: city['Humidity'] || 0 },
+                { id: 'temp', value: city['Temperature'] || 0 }
+            ];
+
+            // Animate form filling
+            formFields.forEach((field, index) => {
+                setTimeout(() => {
+                    const input = document.getElementById(field.id);
+                    input.value = field.value;
+                    input.classList.add('animate__animated', 'animate__flash');
+                    setTimeout(() => {
+                        input.classList.remove('animate__animated', 'animate__flash');
+                    }, 1000);
+                }, index * 100);
+            });
+
+            // Submit the form automatically after a delay
+            setTimeout(() => {
+                document.getElementById('predictionForm').dispatchEvent(new Event('submit'));
+            }, formFields.length * 100 + 200);
         }
 
         // Function to filter cities based on search input
@@ -829,6 +1127,12 @@
 
             console.log('Form data:', formData);
 
+            // Add loading state to button
+            const predictButton = document.getElementById('predictButton');
+            const originalButtonText = predictButton.innerHTML;
+            predictButton.classList.add('predicting');
+            predictButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+
             try {
                 const response = await fetch('/api/predict', {
                     method: 'POST',
@@ -840,6 +1144,10 @@
 
                 const data = await response.json();
                 console.log('Prediction response:', data);
+
+                // Reset button state
+                predictButton.classList.remove('predicting');
+                predictButton.innerHTML = originalButtonText;
 
                 if (data.success) {
                     // Show result with animation
@@ -853,38 +1161,100 @@
                     // Add animation class
                     resultDiv.classList.add('prediction-animation');
 
-                    // Update content
-                    indicator.className = `aqi-indicator aqi-${data.color.replace(' ', '-')}`;
-                    indicator.textContent = data.prediction;
-                    value.textContent = `AQI: ${data.prediction}`;
-                    type.textContent = data.aqi_type;
-                    model.textContent = data.model_name;
-                    confidence.textContent = 'High';
+                    // Update content with staggered animation
+                    setTimeout(() => {
+                        indicator.className = `aqi-indicator aqi-${data.color.replace(' ', '-')} pulse`;
+                        indicator.textContent = data.prediction;
+                    }, 200);
+
+                    setTimeout(() => {
+                        value.textContent = `AQI: ${data.prediction}`;
+                        value.classList.add('animate__animated', 'animate__fadeIn');
+                    }, 400);
+
+                    setTimeout(() => {
+                        type.textContent = data.aqi_type;
+                        type.classList.add('animate__animated', 'animate__fadeIn');
+                    }, 600);
+
+                    setTimeout(() => {
+                        model.textContent = data.model_name;
+                        model.classList.add('animate__animated', 'animate__fadeIn');
+                    }, 800);
+
+                    setTimeout(() => {
+                        confidence.textContent = 'High';
+                        confidence.classList.add('animate__animated', 'animate__fadeIn');
+                    }, 1000);
 
                     // Show result
                     resultDiv.style.display = 'block';
 
                     // Show AQI advice
-                    showAQIAdvice(data.prediction, data.advice);
+                    setTimeout(() => {
+                        showAQIAdvice(data.prediction, data.advice);
+                    }, 1200);
 
                     // Scroll to result
-                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
 
                     // Remove animation class after animation completes
                     setTimeout(() => {
                         resultDiv.classList.remove('prediction-animation');
-                    }, 1000);
+                        value.classList.remove('animate__animated', 'animate__fadeIn');
+                        type.classList.remove('animate__animated', 'animate__fadeIn');
+                        model.classList.remove('animate__animated', 'animate__fadeIn');
+                        confidence.classList.remove('animate__animated', 'animate__fadeIn');
+                    }, 2000);
                 } else {
                     alert('Prediction failed: ' + data.error);
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred during prediction: ' + error.message);
+
+                // Reset button state
+                predictButton.classList.remove('predicting');
+                predictButton.innerHTML = originalButtonText;
             }
         });
 
+        // Function to create animated background particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                // Random position
+                particle.style.left = Math.random() * 100 + '%';
+
+                // Random size
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+
+                // Random animation duration
+                const duration = Math.random() * 20 + 10;
+                particle.style.animationDuration = duration + 's';
+
+                // Random delay
+                const delay = Math.random() * 5;
+                particle.style.animationDelay = delay + 's';
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function () {
+            // Create animated background particles
+            createParticles();
+
             // Check model status on page load
             checkModelStatus();
 
@@ -905,6 +1275,18 @@
                 .catch(error => {
                     console.error('Error fetching training status:', error);
                 });
+
+            // Add input animation effects
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function () {
+                    this.parentElement.classList.add('animate__animated', 'animate__pulse');
+                });
+
+                input.addEventListener('blur', function () {
+                    this.parentElement.classList.remove('animate__animated', 'animate__pulse');
+                });
+            });
         });
     </script>
 </body>
