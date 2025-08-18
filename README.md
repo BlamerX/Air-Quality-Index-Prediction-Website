@@ -10,16 +10,16 @@
     <img src="https://img.shields.io/badge/version-v1.0-blue?style=for-the-badge&logo=git&logoColor=white" alt="Version">
     <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License">
     <img src="https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-    <img src="https://img.shields.io/badge/status-local_only-orange?style=for-the-badge&logo=server&logoColor=white" alt="Deployment Status">
+    <img src="https://img.shields.io/badge/status-online-brightgreen?style=for-the-badge&logo=server&logoColor=white" alt="Deployment Status">
   </p>
   
   <!-- Navigation Menu with Icons -->
   <p align="center">
     <a href="#about"><strong>🌟 About</strong></a> •
     <a href="#features"><strong>✨ Features</strong></a> •
+    <a href="#demo"><strong>🎬 Demo</strong></a> •
     <a href="#tech-stack"><strong>🛠️ Tech Stack</strong></a> •
-    <a href="#getting-started"><strong>📋 Getting Started</strong></a> •
-    <a href="#deployment"><strong>☁️ Deployment</strong></a>
+    <a href="#getting-started"><strong>📋 Getting Started</strong></a>
   </p>
 </div>
 
@@ -46,7 +46,7 @@ Air Quality Index (AQI) is a number used to convey the quality of air by the gov
 
 ### 🧠 Core Features
 
-- **🤖 Multiple ML Models**: Utilizes 15+ machine learning algorithms including Random Forest, XGBoost, Neural Networks, and ensemble methods
+- **🤖 Multiple ML Models**: Utilizes 10+ machine learning algorithms including Random Forest, XGBoost, LightGBM, and CatBoost
 - **⚡ Real-time Predictions**: Instant AQI predictions based on pollutant data
 - **🏙️ City-wise Data**: Comprehensive air quality data for cities across India
 - **📊 Performance Analytics**: Detailed model comparison and performance metrics
@@ -58,12 +58,11 @@ Air Quality Index (AQI) is a number used to convey the quality of air by the gov
 - **📈 Data Visualization**: Interactive charts and graphs for better understanding
 - **🔄 Auto-refresh**: Regular data updates to ensure accuracy
 
-### 🔧 Technical Features
+## 🎬 Demo
 
-- **🚀 Fast API**: RESTful API with JSON responses
-- **📱 Mobile Responsive**: Works seamlessly on all devices
-- **🛡️ Error Handling**: Comprehensive error handling and logging
-- **📈 Performance Optimized**: Optimized for speed and efficiency
+Check out the live demo of the Air Quality Index Prediction System:
+
+🔗 **Live Demo**: [https://aqi-vov2.onrender.com](https://aqi-vov2.onrender.com)
 
 ## 🛠️ Tech Stack
 
@@ -82,7 +81,6 @@ Air Quality Index (AQI) is a number used to convey the quality of air by the gov
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
-  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow">
   <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-learn">
   <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas">
 </p>
@@ -98,38 +96,89 @@ Air Quality Index (AQI) is a number used to convey the quality of air by the gov
 
 ## 📋 Getting Started
 
-### 📦 Installation
+### 📦 Installation Guide
 
-#### 1. Clone the Repository
+Follow these simple steps to get the Air Quality Index Prediction System up and running on your local machine.
+
+#### Prerequisites
+
+- Python 3.10 or higher
+- pip package manager
+
+#### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/BlamerX/Air-Quality-Index-Prediction-Website.git
 cd Air-Quality-Index-Prediction-Website
 ```
 
-#### 2. Create Virtual Environment
+#### Step 2: Create and Activate Virtual Environment
+
+**For Windows:**
 
 ```bash
-# Create virtual environment
 python -m venv venv
-
-# Activate virtual environment
-# On Windows:
 venv\Scripts\activate
-# On macOS/Linux:
+```
+
+**For macOS/Linux:**
+
+```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
 
-#### 3. Install Dependencies
+#### Step 3: Install Dependencies
 
 ```bash
-pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 
-#### 4. Run the Application
+#### Step 4: Run the Application
 
 ```bash
 python app.py
-gunicorn app:app --bind 0.0.0.0:5000
 ```
+
+#### Step 5: Access the Application
+
+Open your web browser and navigate to:
+
+```
+http://localhost:5000
+```
+
+### 🚀 Quick Start Guide
+
+1. **Gather Data**: Click on the "Gather Data" button to scrape the latest air quality data
+2. **Train Models**: Click "Start Training" to train multiple machine learning models
+3. **View Results**: Navigate to the results page to see model performance comparisons
+4. **Make Predictions**: Use the prediction page to input pollutant data and get AQI predictions
+
+### 🔧 Troubleshooting
+
+#### Common Issues and Solutions
+
+1. **Import Error: No module named 'flask_cors'**
+
+   ```bash
+   pip install flask-cors==4.0.0
+   ```
+
+2. **Permission Denied during installation**
+
+   ```bash
+   pip install --user -r requirements.txt
+   ```
+
+3. **Port 5000 already in use**
+   ```bash
+   # Run on a different port
+   python app.py  # Then modify the last line in app.py to use a different port
+   ```
+
+### 📱 System Requirements
+
+- **Operating System**: Windows 10+, macOS 10.14+, or Linux
+- **RAM**: Minimum 4GB, Recommended 8GB or more
+- **Python**: Version 3.10 or higher
